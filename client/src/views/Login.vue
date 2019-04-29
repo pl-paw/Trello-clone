@@ -54,7 +54,10 @@
           this.authenticate({
             strategy: 'local',
             ...this.user,
-          }).then(async(result) => {
+          }).then(async (result) => {
+            console.log(result);
+           // await this.logout();
+          //  await this.authenticate();
              this.$router.push('/boards');
           })
             .catch((e) => {

@@ -35,7 +35,10 @@ class LocalVerifier extends Verifier{
       .then(entity => {
         const id = entity[this.service.id];
         const payload = { [`${this.options.entity}Id`]: id };
-        delete entity.password;
+        console.log('entity', entity);
+        console.log('payload', payload);
+        delete  entity.password;
+        payload.user= entity;
         done(null, entity, payload);
       })
       .catch(error => error ? done(error) : done(null, error, { message: 'Invalid login' }));
