@@ -26,10 +26,19 @@ export default new Vuex.Store({
     }),
     service('lists', {
       instaceDefaults: {
-        name: '',
-        order: '',
+        title: '',
+        description: '',
         boardId: '',
         archived: false,
+        order: 0,
+        listId: '',
+        members: []
+      },
+    }),
+    service('cards', {
+      instaceDefaults: {
+        name: '',
+        background: '',
       },
     }),
     auth({ userService: 'users' }),

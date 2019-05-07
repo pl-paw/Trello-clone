@@ -13,6 +13,13 @@
                 {{list.name}}
               </div>
             </v-card-title>
+            <v-card-actions>
+             <create-card
+              :listId="list._id"
+              :boardId="$route.params.id">
+
+             </create-card>
+            </v-card-actions>
           </v-card>
         </v-flex>
         <v-flex sm4 pa-2>
@@ -46,9 +53,11 @@
 
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex';
+  import CreateCard from "./CreateCard";
 
   export default {
     name: 'board',
+    components: {CreateCard},
     data: () => ({
       board: {},
       validList: false,
@@ -70,10 +79,18 @@
       }).then( response => {
         const lists = response.data || response;
       })
+      this.findCards({
+        query: {
+          boardId: this.$route.params.id,
+        }
+      }).then( response => {
+        const cards = response.data || response;
+      })
     },
     methods: {
       ...mapActions('boards', {getBoard: 'get'}),
       ...mapActions('lists', {findLists: 'find'}),
+      ...mapActions('cards', {findCards: 'find'}),
       createList() {
         if (this.validList) {
           const { List } = this.$FeathersVuex;
@@ -92,8 +109,21 @@
       ...mapState('boards', {loadingBoard: 'isGetPending'}),
       ...mapState('lists', {loadingLists: 'isFindPending', creatingList: 'isCreatePending'}),
       ...mapGetters('lists', {findListsInStore: 'find'}),
+      ...mapGetters('cards', {findCardsInStore: 'find'}),
       lists(){
-        return this.findListsInStore({query:{boardId: this.$route.params.id}}).data;
+        return this.findListsInStore({
+          query:{
+            boardId: this.$route.params.id
+          }
+        }).data;
+      },
+      cards(){
+        return this.findCardsInStore({
+          query:{
+            boardId: this.$route.params.id,
+          }
+        }).data;
+
       }
     }
 
