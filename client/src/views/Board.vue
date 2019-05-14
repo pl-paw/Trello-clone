@@ -1,28 +1,46 @@
 <template>
   <v-container fluid>
-    <v-slide-y-reverse-transition mode="out-in">
-      <v-layout row align-center wrap>
-        <v-progress-circular v-if="loadingBoard || loadingLists" :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
+    <v-slide-y-transition mode="out-in">
+      <v-layout row wrap>
+        <v-progress-circular
+          v-if="loadingBoard || loadingLists"
+          :size="60"
+          :width="6"
+          indeterminate
+          color="primary">
+        </v-progress-circular>
         <v-flex xs12>
           <h2 v-if="board">{{board.name}}</h2>
         </v-flex>
-        <v-flex v-if="!loadingLists" sm3 v-for="list in lists" :key="list._id" pa-2>
-          <v-card>
-             <v-card-title primary-title>
-              <div class="headline">
-                {{list.name}}
-              </div>
+        <v-flex v-if="!loadingLists" sm3 v-for="list in lists" :key="list._id" pa-3>
+          <v-card @dragover="setDroppingList($event, list)" :class="{ 'green lighten-4': droppingList == list }">             <v-card-title primary-title>
+               <v-layout column>
+                 <v-flex xs12>
+                   <div class ="headline">{{list.name}}</div>
+                 </v-flex>
+                  <v-flex xs12  v-if="cardsByListId[list._id]" v-for="card in cardsByListId[list._id]" :key="card._id" class="pa-1">
+                    <v-card draggable="true" @dragstart="startDraggingCard(card)" @dragend="dropCard()">                     <v-container fluid grid-list-lg>
+                       <v-layout row>
+                         <v-flex xs12>
+                           <div>
+                             <div class="headline">{{card.title}}</div>
+                           </div>
+                         </v-flex>
+                       </v-layout>
+                     </v-container>
+                    </v-card>
+                 </v-flex>
+               </v-layout>
             </v-card-title>
             <v-card-actions>
-             <create-card
+              <create-card
               :listId="list._id"
               :boardId="$route.params.id">
-
-             </create-card>
+              </create-card>
             </v-card-actions>
           </v-card>
         </v-flex>
-        <v-flex sm4 pa-2>
+        <v-flex sm4 pa-3>
           <v-card>
             <v-card-title primary-title style="flex-direction: column;">
               <div class="headline">Create List</div>
@@ -41,24 +59,28 @@
                 <v-btn type="submit" :disabled="!validList">Create List</v-btn>
                 </v-form>
                 <v-progress-circular v-if="creatingList" :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
-
               </div>
             </v-card-title>
           </v-card>
         </v-flex>
       </v-layout>
-    </v-slide-y-reverse-transition>
+    </v-slide-y-transition>
   </v-container>
 </template>
 
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex';
-  import CreateCard from "./CreateCard";
+  import CreateCard from './CreateCard'
 
   export default {
     name: 'board',
-    components: {CreateCard},
+    components: {
+      CreateCard
+    },
     data: () => ({
+      droppingList: null,
+      draggingCard: null,
+      chip1: true,
       board: {},
       validList: false,
       list:{
@@ -71,21 +93,21 @@
     mounted(){
       this.getBoard(this.$route.params.id).then( response => {
         const board = response.data || response;
-      })
+      });
       this.findLists({
         query: {
           boardId: this.$route.params.id,
         }
       }).then( response => {
         const lists = response.data || response;
-      })
+      });
       this.findCards({
         query: {
           boardId: this.$route.params.id,
         }
       }).then( response => {
         const cards = response.data || response;
-      })
+      });
     },
     methods: {
       ...mapActions('boards', {getBoard: 'get'}),
@@ -93,7 +115,7 @@
       ...mapActions('cards', {findCards: 'find'}),
       createList() {
         if (this.validList) {
-          const { List } = this.$FeathersVuex;
+          const {List} = this.$FeathersVuex;
           this.list.boardId = this.$route.params.id;
           const list = new List(this.list);
           list.save();
@@ -101,8 +123,25 @@
             name: '',
             order: 0,
             archived: false,
-         }
+          }
         }
+      },
+      startDraggingCard(card) {
+        this.draggingCard = card;
+      },
+      setDroppingList(event, list) {
+        this.droppingList= list;
+        event.preventDefault();
+      },
+      dropCard() {
+        if (this.droppingList) {
+          if (this.draggingCard.listId !== this.droppingList._id) {
+            this.draggingCard.listId = this.droppingList._id;
+            this.draggingCard.save();
+          }
+        }
+        this.droppingList = null;
+        this.draggingCard = null;
       },
     },
     computed: {
@@ -110,10 +149,11 @@
       ...mapState('lists', {loadingLists: 'isFindPending', creatingList: 'isCreatePending'}),
       ...mapGetters('lists', {findListsInStore: 'find'}),
       ...mapGetters('cards', {findCardsInStore: 'find'}),
+      ...mapState('cards', {loadingCards: 'isFindPending', creatingCard: 'isCreatePending'}),
       lists(){
         return this.findListsInStore({
           query:{
-            boardId: this.$route.params.id
+            boardId: this.$route.params.id,
           }
         }).data;
       },
@@ -121,11 +161,17 @@
         return this.findCardsInStore({
           query:{
             boardId: this.$route.params.id,
-          }
+          },
         }).data;
-
-      }
-    }
+      },
+      cardsByListId() {
+        return this.cards.reduce((byId, card) => {
+          byId[card.listId] = byId[card.listId] || [];
+          byId[card.listId].push(card);
+          return byId;
+        }, {});
+      },
+    },
 
   };
 </script>

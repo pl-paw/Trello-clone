@@ -11,7 +11,7 @@ Vue.use(FeathersVuex);
 export default new Vuex.Store({
   plugins: [
     service('users', {
-      instaceDefaults: {
+      instanceDefaults: {
         username: '',
         password: '',
         displayName: '',
@@ -19,26 +19,28 @@ export default new Vuex.Store({
       },
     }),
     service('boards', {
-      instaceDefaults: {
+      instanceDefaults: {
         name: '',
         background: '',
       },
     }),
     service('lists', {
-      instaceDefaults: {
-        title: '',
-        description: '',
+      instanceDefaults: {
+        name: '',
+        order: 0,
         boardId: '',
         archived: false,
-        order: 0,
-        listId: '',
-        members: []
       },
     }),
     service('cards', {
-      instaceDefaults: {
-        name: '',
-        background: '',
+      instanceDefaults: {
+        title: '',
+        description: '',
+        order: 0,
+        listsId: '',
+        boardId: '',
+        archived: false,
+        members: [],
       },
     }),
     auth({ userService: 'users' }),
