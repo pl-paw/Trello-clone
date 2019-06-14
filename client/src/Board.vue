@@ -1,31 +1,5 @@
 <template>
   <v-container fluid>
-<<<<<<< HEAD
-    <v-slide-y-reverse-transition mode="out-in">
-      <v-layout row wrap>
-        <v-progress-circular v-if="loadingBoard || loadingLists" :size="60" :width="6" indeterminate color="primary"></v-progress-circular>
-        <v-flex xs10>
-          <h2 v-if="board">{{board.name}}</h2>
-        </v-flex>
-        <v-flex v-if="!loadingLists" sm3 v-for="list in lists" :key="list._id" pa-3>
-          <v-card>
-             <v-card-title primary-title>
-               <v-layout column>
-                 <v-flex xs14>
-                   <div class ="headline">{{list.name}}</div>
-                 </v-flex>
-                  <v-flex xs10  v-if="cardsByListId[list._id]" v-for="card in cardsByListId[list._id]" :key="card._id" class="pa-1">
-                   <v-card color="blue" class="white--text">
-                     <v-cointainer fluid grid-list-lg>
-                       <v-layout row>
-                         <v-flex xs11>
-                           <div>
-                             <div class=headline>{{card.title}}</div>
-                           </div>
-                         </v-flex>
-                       </v-layout>
-                     </v-cointainer>
-=======
     <v-slide-y-transition mode="out-in">
       <v-layout row wrap>
         <v-progress-circular
@@ -54,7 +28,6 @@
                          </v-flex>
                        </v-layout>
                      </v-container>
->>>>>>> Kamila
                     </v-card>
                  </v-flex>
                </v-layout>
@@ -105,11 +78,8 @@
       CreateCard
     },
     data: () => ({
-<<<<<<< HEAD
-=======
       droppingList: null,
       draggingCard: null,
->>>>>>> Kamila
       chip1: true,
       board: {},
       validList: false,

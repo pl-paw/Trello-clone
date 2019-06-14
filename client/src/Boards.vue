@@ -5,7 +5,7 @@
         <v-progress-circular v-if="loading" :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
         <v-flex v-if="!loading" sm3 v-for="board in boards" :key="board._id" pa-2>
           <v-card>
-            <img height="200px" width="300px"  :src="board.background" />
+            <img height="220px" width="290px"  :src="board.background" />
             <v-card-title primary-title>
               <div class="headline">
                 {{board.name}}
@@ -51,49 +51,50 @@
 </template>
 
 <script>
-  import {mapActions, mapState, mapGetters} from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 
-  export default {
-    name: 'boards',
-    data: () => ({
-      valid: false,
-      board:{
-        name:'',
-        background:'',
-      },
-      notEmptyRules: [(value) => !!value || 'Cannot be empty!'],
-
-    }),
-    mounted(){
-     this.findBoards({query:{}}).then((response)=>{
-       const boards = response.data || response;
-     })
+export default {
+  name: 'boards',
+  data: () => ({
+    valid: false,
+    board: {
+      name: '',
+      background: '',
     },
-    methods: {
-      ...mapActions('boards', {findBoards: 'find'}),
-      createBoard() {
-        if (this.valid) {
-          const { Board } = this.$FeathersVuex;
-          const board = new Board(this.board);
-          board.save();
-          this.board = {
-            name: '',
-            background:'',
-          }
-        }
-      },
-  },
-    computed: {
-      ...mapState('boards', {loading: 'isFindPending', creating: 'isCreatePending'}),
-      ...mapGetters('boards', {findBoardsInStore: 'find'}),
-      ...mapState('auth', {user: 'payload'}),
-      boards(){
-        return this.user ? this.findBoardsInStore({
-          query:{
-            ownerId: this.user.userId,
-          }}).data: [];
-      }
-    }
+    notEmptyRules: [value => !!value || 'Cannot be empty!'],
 
-  };
+  }),
+  mounted() {
+    this.findBoards({ query: {} }).then((response) => {
+      const boards = response.data || response;
+    });
+  },
+  methods: {
+    ...mapActions('boards', { findBoards: 'find' }),
+    createBoard() {
+      if (this.valid) {
+        const { Board } = this.$FeathersVuex;
+        const board = new Board(this.board);
+        board.save();
+        this.board = {
+          name: '',
+          background: '',
+        };
+      }
+    },
+  },
+  computed: {
+    ...mapState('boards', { loading: 'isFindPending', creating: 'isCreatePending' }),
+    ...mapGetters('boards', { findBoardsInStore: 'find' }),
+    ...mapState('auth', { user: 'payload' }),
+    boards() {
+      return this.user ? this.findBoardsInStore({
+        query: {
+          ownerId: this.user.userId,
+        },
+      }).data : [];
+    },
+  },
+
+};
 </script>

@@ -16,7 +16,7 @@
           </v-avatar>
           <h3>Hello {{user.user.username}}!     </h3>
         </v-layout>
-
+        <v-btn @click to="/profile" flat>Profile</v-btn>
         <v-btn flat @click="logout">LogOut</v-btn>
       </v-toolbar-items>
     </v-toolbar>
@@ -31,22 +31,27 @@
 </template>
 
 <script>
-import {mapState, mapActions} from 'vuex'
-  export default {
+import { mapState, mapActions } from 'vuex';
+
+export default {
   name: 'App',
   data() {
     return {
-      fixed: false
+      fixed: false,
     };
   },
-computed: {
-  ...mapState('auth', {user: 'payload'})
-},
-methods:{
-    ...mapActions('auth', {authLogout: 'logout'}),
-  logout(){
-      this.authLogout().then(()=>this.$router.push('/login'))
-  }
-}
-  };
+  computed: {
+    ...mapState('auth', { user: 'payload' }),
+
+  },
+
+  methods: {
+    ...mapActions('auth', { authLogout: 'logout' }),
+
+    logout() {
+      this.authLogout().then(() => this.$router.push('/login'));
+    },
+
+  },
+};
 </script>
